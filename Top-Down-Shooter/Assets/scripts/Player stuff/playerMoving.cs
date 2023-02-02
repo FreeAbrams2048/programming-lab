@@ -40,6 +40,13 @@ public class playerMoving : MonoBehaviour
         if (hit.collider != null)
         {
             trailScript.SetTargetPosition(hit.point);
+
+            var charger = hit.collider.GetComponent<Charger>();
+            if (charger != null)
+            {
+                charger.TakeDamage(5);
+                Debug.Log("Hit");
+            }
         }
 
         else
