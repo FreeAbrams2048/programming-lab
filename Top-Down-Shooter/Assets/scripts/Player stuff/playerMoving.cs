@@ -6,6 +6,7 @@ public class playerMoving : MonoBehaviour
 {
     Transform trans;
     bool cooldown = false;
+    [SerializeField] Rigidbody2D rig;
 
     [SerializeField] private float speed;
     [SerializeField] private Transform firePoint;
@@ -58,22 +59,24 @@ public class playerMoving : MonoBehaviour
 
     void walk()
     {
-        if (Input.GetKey(KeyCode.W))
-        {
-            trans.position += transform.up * Time.deltaTime * speed;
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            trans.position += transform.up * Time.deltaTime * -speed;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            trans.position += transform.right * Time.deltaTime * speed;
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            trans.position += transform.right * Time.deltaTime * -speed;
-        }
+        // if (Input.GetKey(KeyCode.W))
+        // {
+        //     trans.position += transform.up * Time.deltaTime * speed;
+        //  }
+        //  if (Input.GetKey(KeyCode.S))
+        // {
+        //      trans.position += transform.up * Time.deltaTime * -speed;
+        //  }
+        // if (Input.GetKey(KeyCode.D))
+        // {
+        //     trans.position += transform.right * Time.deltaTime * speed;
+        // }
+        // if (Input.GetKey(KeyCode.A))
+        // {
+        //    trans.position += transform.right * Time.deltaTime * -speed;
+        //}
+
+        rig.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * speed, Input.GetAxisRaw("Vertical") * speed);
     }
 
     void LookAtMouse()

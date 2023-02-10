@@ -8,7 +8,7 @@ public class spawner : MonoBehaviour
     [SerializeField] private Transform spawnPoint;
     void Start()
     {
-        Instantiate(charger);
+        Instantiate(charger, transform.localPosition,transform.rotation);
     }
 
     // Update is called once per frame
