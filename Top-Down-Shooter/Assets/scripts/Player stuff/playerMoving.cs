@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class playerMoving : MonoBehaviour
 {
+    public float playerHPMax = 20;
+    public float playerHPCurrent = 20;
+
     Transform trans;
     bool cooldown = false;
     [SerializeField] Rigidbody2D rig;
