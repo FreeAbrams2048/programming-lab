@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class playerMoving : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class playerMoving : MonoBehaviour
     Transform trans;
     bool cooldown = false;
     [SerializeField] Rigidbody2D rig;
-
+    [SerializeField] private FeildOfView fieldOfView;
     [SerializeField] private float speed;
     [SerializeField] private Transform firePoint;
     [SerializeField] private GameObject _trail;
@@ -25,7 +26,18 @@ public class playerMoving : MonoBehaviour
     void Update()
     {
         walk();
-        LookAtMouse();
+        //LookAtMouse();
+        Vector3 mousePosition = GetMousePosition();//this bit is for fov
+
+        Vector3 aimDirection = (mousePosition - transform.position).normalized;
+        float angle = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
+        firePoint.eulerAngles = new Vector3(0, 0, angle);
+
+        Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition); //this bit is to turn the character
+        transform.up = mousePos - new Vector2(transform.position.x, transform.position.y);
+
+        fieldOfView.SetAimDirection(aimDirection);
+        fieldOfView.SetOrigin(transform.position);
         if (Input.GetMouseButtonDown(0) && cooldown == false)
         {
             shoot();
@@ -84,8 +96,7 @@ public class playerMoving : MonoBehaviour
 
     void LookAtMouse()
     {
-        Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        transform.up = mousePos - new Vector2(transform.position.x, transform.position.y);
+
     }
 
     IEnumerator waiting()
@@ -93,5 +104,25 @@ public class playerMoving : MonoBehaviour
         cooldown = true;
         yield return new WaitForSeconds(0.4f);
         cooldown = false;
+    }
+
+    static Vector3 GetMousePosition()
+    {
+        Vector3 vec = GetMouseWorldPositionWithZ(Input.mousePosition, Camera.main);
+        vec.z = 0;
+        return vec;
+    }
+    static Vector3 GetMouseWorldPositionWithZ()
+    {
+        return GetMouseWorldPositionWithZ(Input.mousePosition, Camera.main);
+    }
+    static Vector3 GetMouseWorldPositionWithZ(Camera worldCamera)
+    {
+        return GetMouseWorldPositionWithZ(Input.mousePosition, worldCamera);
+    }
+    static Vector3 GetMouseWorldPositionWithZ(Vector3 screenPosition, Camera worldCamera)
+    {
+        Vector3 worldPosition = worldCamera.ScreenToWorldPoint(screenPosition);
+        return worldPosition;
     }
 }

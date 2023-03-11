@@ -12,7 +12,7 @@ public class Charger : MonoBehaviour
 
     float minDist = 20;
     float cDist;
-    bool isCharging;
+    bool canCharge = true;
 
     void Start()
     {
@@ -25,13 +25,13 @@ public class Charger : MonoBehaviour
 
         cDist = Vector3.Distance(target.position, transform.position);
 
-        if (isCharging == false)
+        if (cDist>minDist)
         {
             transform.up = target.position - transform.position;
             transform.position += transform.up * Time.deltaTime * 4;
         }
 
-        if (cDist < minDist)
+        if (cDist < minDist && canCharge == true) 
         {
             StartCoroutine(ChargeHandler());
         }
@@ -50,14 +50,17 @@ public class Charger : MonoBehaviour
 
     IEnumerator ChargeHandler()         //handles timings for the enemy to dash, and has the enemy wait after dashing to act as a cooldown
     {
-        isCharging = true;
         yield return new WaitForSeconds(0.5f);
         Physics2D.IgnoreLayerCollision(3, 6, true);
         transform.position += transform.up * Time.deltaTime * 20;
         yield return new WaitForSeconds(1f);
         Physics2D.IgnoreLayerCollision(3, 6, false);
-        yield return new WaitForSeconds(1f);
-        isCharging = false;
-        yield break;
+        StartCoroutine(coolDown());
+    }
+    IEnumerator coolDown()
+    {
+        canCharge = false;
+        yield return new WaitForSeconds(2f);
+        canCharge = true;
     }
 }
