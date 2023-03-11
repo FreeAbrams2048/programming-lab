@@ -27,7 +27,7 @@ public class FeildOfView : MonoBehaviour
         {
             if (on)
             {
-                viewDistance = 0;
+                viewDistance = 90;
                 on = false;
             }
             else
