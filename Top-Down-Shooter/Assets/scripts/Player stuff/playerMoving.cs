@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
 
 public class playerMoving : MonoBehaviour
@@ -8,6 +9,7 @@ public class playerMoving : MonoBehaviour
     public float playerHPMax = 20;
     public float playerHPCurrent = 20;
 
+    [SerializeField] Text ammoCount;
     Transform trans;
     bool cooldown = false;
     [SerializeField] Rigidbody2D rig;
@@ -16,6 +18,8 @@ public class playerMoving : MonoBehaviour
     [SerializeField] private Transform firePoint;
     [SerializeField] private GameObject _trail;
     [SerializeField] private float weaponRange = 10f;
+    int maxAmmo = 12;
+    int currentAmmo = 12;
     //[SerializeField] private Animator muzzleFlashAnimator;
 
     void Start()
@@ -26,7 +30,6 @@ public class playerMoving : MonoBehaviour
     void Update()
     {
         walk();
-        //LookAtMouse();
         Vector3 mousePosition = GetMousePosition();//this bit is for fov
 
         Vector3 aimDirection = (mousePosition - transform.position).normalized;
@@ -40,8 +43,19 @@ public class playerMoving : MonoBehaviour
         fieldOfView.SetOrigin(transform.position);
         if (Input.GetMouseButtonDown(0) && cooldown == false)
         {
+            currentAmmo--;
             shoot();
-            //StartCoroutine(waiting());
+            StartCoroutine(waiting());
+        }
+
+        if (currentAmmo == 0 || Input.GetKeyDown(KeyCode.R))
+        {
+            StartCoroutine(reload());
+            ammoCount.text = "reloading";
+        }
+        else
+        {
+            ammoCount.text = $"Ammo: {currentAmmo}";
         }
     }
 
@@ -94,15 +108,18 @@ public class playerMoving : MonoBehaviour
         rig.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * speed, Input.GetAxisRaw("Vertical") * speed);
     }
 
-    void LookAtMouse()
-    {
-
-    }
-
     IEnumerator waiting()
     {
         cooldown = true;
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(0.5f);
+        cooldown = false;
+    }
+
+    IEnumerator reload()
+    {
+        cooldown = true;
+        yield return new WaitForSeconds(3f);
+        currentAmmo = maxAmmo;
         cooldown = false;
     }
 
