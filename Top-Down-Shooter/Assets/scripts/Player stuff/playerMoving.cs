@@ -1,3 +1,4 @@
+using SaveLoadSystem;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,7 +20,13 @@ public class playerMoving : MonoBehaviour
     [SerializeField] private GameObject _trail;
     [SerializeField] private float weaponRange = 10f;
     int maxAmmo = 12;
-    int currentAmmo = 12;
+    public int currentAmmo = 12;
+
+    public UnityEngine.UI.Slider Slider;
+    public Color PLow;
+    public Color PHigh;
+
+    private PlayerData MyData = new PlayerData();
     //[SerializeField] private Animator muzzleFlashAnimator;
 
     void Start()
@@ -57,6 +64,9 @@ public class playerMoving : MonoBehaviour
         {
             ammoCount.text = $"Ammo: {currentAmmo}";
         }
+
+        Slider.value = playerHPCurrent;
+        Slider.fillRect.GetComponentInChildren<UnityEngine.UI.Image>().color = Color.Lerp(PLow, PHigh, Slider.normalizedValue);
     }
 
     void shoot()
@@ -86,25 +96,28 @@ public class playerMoving : MonoBehaviour
         }
     }
 
+    private void LateUpdate()
+    {
+        Updater();
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            SaveGameManager.CurrentSaveData.PLayerData = MyData;
+            SaveGameManager.SaveGame();
+        }
+        if (Input.GetKeyDown(KeyCode.Y))
+        {
+            SaveGameManager.LoadGame();
+            MyData = SaveGameManager.CurrentSaveData.PLayerData;
+
+            transform.position = MyData.PlayerPosition;
+            playerHPCurrent = MyData.Health;
+            currentAmmo = MyData.Ammo;
+        }
+    }
+
     void walk()
     {
-        // if (Input.GetKey(KeyCode.W))
-        // {
-        //     trans.position += transform.up * Time.deltaTime * speed;
-        //  }
-        //  if (Input.GetKey(KeyCode.S))
-        // {
-        //      trans.position += transform.up * Time.deltaTime * -speed;
-        //  }
-        // if (Input.GetKey(KeyCode.D))
-        // {
-        //     trans.position += transform.right * Time.deltaTime * speed;
-        // }
-        // if (Input.GetKey(KeyCode.A))
-        // {
-        //    trans.position += transform.right * Time.deltaTime * -speed;
-        //}
-
         rig.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * speed, Input.GetAxisRaw("Vertical") * speed);
     }
 
@@ -121,6 +134,13 @@ public class playerMoving : MonoBehaviour
         yield return new WaitForSeconds(3f);
         currentAmmo = maxAmmo;
         cooldown = false;
+    }
+
+    void Updater()
+    {
+        MyData.PlayerPosition = transform.position;
+        MyData.Health = playerHPCurrent;
+        MyData.Ammo = currentAmmo;
     }
 
     static Vector3 GetMousePosition()
@@ -142,4 +162,12 @@ public class playerMoving : MonoBehaviour
         Vector3 worldPosition = worldCamera.ScreenToWorldPoint(screenPosition);
         return worldPosition;
     }
+}
+
+[System.Serializable]
+public struct PlayerData
+{
+    public Vector3 PlayerPosition;
+    public float Health;
+    public int Ammo;
 }
